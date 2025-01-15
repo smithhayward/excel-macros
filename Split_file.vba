@@ -5,7 +5,9 @@ Sub Split_File()
   
 ' HARD CODED TO TAKE A 3-COLUMN WORKSHEET AND CREATE SEPARATE WORKBOOKS WITH 1000 records (Header inclusive) each.
 '
-' INSTRUCTIONS:  Add this VBA Macro into your macro-enabled (.xlsm) excel file and run the Split_File macro.  If your needs are different you can modify the header collection and writing section as well as change the number of records per file.
+' INSTRUCTIONS:  Add this VBA Macro into your macro-enabled (.xlsm) excel file and run the Split_File macro.
+'                If your needs are different you can modify the header collection and writing section as well as change the number of records per file.
+'
 '
 ' ==============================================
 '   VARIABLE DECLARATION AND INITIALIZATION
@@ -13,17 +15,20 @@ Sub Split_File()
 Dim filePath As String
 filePath = ThisWorkbook.Path
 Dim filePrefix As String
-filePrefix = InputBox("Give the series of files a unique file name prefix:")
+filePrefix = ""
 
-    If filePrefix = "" Then
-    filePrefix = "splitfile"
-    End If
+Do While filePrefix = ""
+    filePrefix = InputBox("Give the series of files a unique file name prefix: (e.g. MyFile, Orders, etc.)", "File Names", "SplitFile")
+Loop
+
+Dim fileExt As String
+
+Do While fileExt <> "xls" And fileExt <> "xlsx" And fileExt <> "csv"
+    fileExt = InputBox("Enter csv, xls or xlsx:", "Select Output File Type", "csv")
+Loop
 
 Dim fileCount As Integer
 fileCount = 1
-
-Dim fileExt As String
-fileExt = "xlsx"
 
 Dim savePath As String
 
@@ -112,8 +117,24 @@ For z = 0 To lastFileIndex
     Next y
     
     
+    
+    
+    ' SAVE THE FILE DEPENDING ON THE FILE EXTENSION
+    If fileExt = "xlsx" Then
     On Error Resume Next
-        NewWb.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
+    NewWb.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
+    End If
+    
+    If fileExt = "xls" Then
+    On Error Resume Next
+    NewWb.SaveAs Filename:=savePath, FileFormat:=xlWorkbookNormal
+    End If
+    
+    If fileExt = "csv" Then
+    On Error Resume Next
+    NewWb.SaveAs Filename:=savePath, FileFormat:=xlCSV
+    End If
+    
     If Err.Number <> 0 Then
         MsgBox "Error saving the file. Please check the save path.", vbExclamation
         Exit Sub
@@ -138,3 +159,4 @@ MsgBox CStr(lastFileIndex + 1) + " file" + plural + " " + haveHas + " been gener
 
 
 End Sub
+
